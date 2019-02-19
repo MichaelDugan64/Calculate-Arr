@@ -1,5 +1,231 @@
 /*******************************************************************************************\
-*	int *calculateArr																		        *
+*	Matrix Multiplication																	*
+*																							*
+*	This program multiplies two given matricies and prints the resulting matrix from a		*
+*	file of given matrixes and their sizes.													*
+*																							*
+*	Input:																					*
+*	*																						*
+*	*	ifstream: The file containing the matrices											*
+*	*																						*
+*																							*
+*	Output:																					*
+*	*																						*
+*	*	cout: The input matrices and their product											*
+*	*																						*
+*																							*
+*	Written by student Michael Dugan (med170000) starting Febuary 11th						*
+*	for class Cs 1337.004																	*
+*																							*
+\*******************************************************************************************/
+
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+
+using std::cout;
+using std::endl;
+using std::right;
+using std::setw;
+using std::cin;
+using std::ifstream;
+
+void displayMatrix(int *arr, int rows, int columns, char *str);
+void erase(int *&arr);
+
+bool readArr(ifstream &file, int &rows, int &columns, int *&arr);
+
+int *createArr(int size);
+int *calculateArr(int *arr1, int rows1, int columns1, int *arr2, int rows2, int columns2);
+
+int main()
+{
+	ifstream inputMatrices;
+
+	bool valid;
+	char	end, fileName[] = { "CS1Asg2Data.txt" }, one[] = { "Matrix 1" },
+			two[] = { "Matrix 2" }, result[] = { "Matrices multiplied" };
+
+	int *arr1, *arr2, *arr3, rows1, rows2, columns1, columns2;
+
+	inputMatrices.open(fileName);
+
+	if (inputMatrices)
+	{
+		cout << "Matrices from \"" << fileName << "\"\n\n";
+
+		while (inputMatrices)
+		{
+			valid = readArr(inputMatrices, rows1, columns1, arr1); 
+			valid = (readArr(inputMatrices, rows2, columns2, arr2) && valid); 
+
+			if (valid) // Both readins worked
+			{
+				if (columns1 == rows2) // The arrays can be multiplied
+				{
+					arr3 = calculateArr(arr1, rows1, columns1, arr2, rows2, columns2);
+
+					displayMatrix(arr1, rows1, columns1, one);
+					displayMatrix(arr2, rows2, columns2, two);
+					displayMatrix(arr3, rows1, columns2, result);
+
+					erase(arr3);
+				}
+				else
+				{
+					cout << "The number of rows in the first array was not the same\n"
+						<< "as the number of columns in the second array.\n\n";
+				}
+			}
+
+			erase(arr1);
+			erase(arr2);
+		}
+
+		inputMatrices.close();
+	}
+	else
+	{
+		cout << "The file, \"" << fileName << "\" could not be opened.\n";
+	}
+
+	cout << "Have a nice day!\n\n(Press enter to exit)";
+	cin.get(end);
+
+	return 0;
+}
+
+/*******************************************************************************************\
+*	void displayMatrix																		*
+*																							*
+*	This function displays a matrix with its ordered number									*
+*																							*
+*	Input:																					*
+*	*																						*
+*	*	int *arr: The array to be displayed													*
+*	*																						*
+*	*	int rows: The array's # of rows														*
+*	*																						*
+*	*	int columns: The array's # of columns												*
+*	*																						*
+*	*	char *str: The displayed array name													*
+*	*																						*
+*																							*
+*	Output:																					*
+*	*																						*
+*	*	cout: The matrix in (rows by columns) form											*
+*	*																						*
+*																							*
+\*******************************************************************************************/
+
+void displayMatrix(int *arr, int rows, int columns, char *str)
+{
+	cout << str << endl << right;
+
+	for (int i = 1; i <= rows; i++)
+	{
+		for (int j = 1; j <= columns; j++)
+		{
+			cout << setw(6) << arr[i * j - 1]; // Gives each number a formatted space
+		}
+
+		cout << endl;
+	}
+
+	cout << endl;
+}
+
+/*******************************************************************************************\
+*	void erase																				*
+*																							*
+*	This function deletes an array of integers												*
+*																							*
+*	Input:																					*
+*	*																						*
+*	*	int *&arr: The array to be deleted													*
+*	*																						*
+*																							*
+\*******************************************************************************************/
+
+void erase(int *&arr)
+{
+	delete[] arr;
+	arr = nullptr;
+}
+
+/*******************************************************************************************\
+*	bool readArr																			*
+*																							*
+*	This function reads in an array from a file												*
+*																							*
+*	Input:																					*
+*	*																						*
+*	*	ifstream &file: The file to be read from											*
+*	*																						*
+*	*	int &rows: The number of rows														*
+*	*																						*
+*	*	int &columns: The number of columns													*
+*	*																						*
+*	*	int *arr: The array to be read														*
+*	*																						*
+*																							*
+*	Output:																					*
+*	*																						*
+*	*	return: Whether or not the read suceeded											*
+*	*																						*
+*																							*
+\*******************************************************************************************/
+
+bool readArr(ifstream &file, int &rows, int &columns, int *&arr)
+{
+	bool valid = true;
+
+	if (file >> rows >> columns) // The read suceeded
+	{
+		arr = createArr(rows * columns); // Create a new array
+
+		for (int i = 1; i <= rows; i++) // Fill that array
+		{
+			for (int j = 1; j <= columns; j++)
+			{
+				file >> arr[i * j - 1];
+			}
+		}
+	}
+	else
+	{
+		valid = false;
+	}
+
+	return valid;
+}
+
+/*******************************************************************************************\
+*	int *createArr																			*
+*																							*
+*	This function creates a dynamically allocated array										*
+*																							*
+*	Input:																					*
+*	*																						*
+*	*	int size: The number of integers to be stored in the array							*
+*	*																						*
+*																							*
+*	Output:																					*
+*	*																						*
+*	*	return: The pointer to the array													*
+*	*																						*
+*																							*
+\*******************************************************************************************/
+
+int *createArr(int size)
+{
+	int *pointer = new int[size];
+
+	return pointer;
+}
+
+/*******************************************************************************************\
+*	int *calculateArr																		*
 *																							*
 *	This function multipies two matrices and returns the resultant matrix					*
 *																							*
