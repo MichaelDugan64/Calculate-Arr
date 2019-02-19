@@ -1,0 +1,66 @@
+/*******************************************************************************************\
+*	int *calculateArr																		        *
+*																							*
+*	This function multipies two matrices and returns the resultant matrix					*
+*																							*
+*	Input:																					*
+*	*																						*
+*	*	int *arr1: The first matrix															*
+*	*																						*
+*	*	int rows1: The first array's number of rows											*
+*	*																						*
+*	*	int columns1: The first array's number of columns									*
+*	*																						*
+*	*	int *arr2: The second matrix														*
+*	*																						*
+*	*	int rows2: The second array's number of rows										*
+*	*																						*
+*	*	int columns2: The second array's number of columns									*
+*	*																						*
+*																							*
+*	Output:																					*
+*	*																						*
+*	*	return: The pointer to the resultant array											*
+*	*																						*
+*																							*
+\*******************************************************************************************/
+
+int *calculateArr(int *arr1, int rows1, int columns1, int *arr2, int rows2, int columns2)
+{
+	int sum, *result, *asArr1, *asArr2;
+
+	asArr1 = createArr(columns1);
+	asArr2 = createArr(rows2);
+
+	result = createArr(columns1 * rows2);
+
+	for (int i = 1; i <= rows1; i++)
+	{
+		for (int x = 1; x <= columns1; x++) // Fills the first assisting array
+		{
+			asArr1[x - 1] = arr1[i * x - 1];
+		}
+
+		for (int j = 1; j <= columns2; j++)
+		{
+			for (int x = 1; x <= rows2; x++) // Fills the second assisting array
+			{
+				asArr2[x - 1] = arr2[j * x - 1];
+			}
+
+			sum = 0;
+
+			for (int x = 0; x < rows2; x++) // Gets the sum of one place
+			{
+				sum += asArr1[x] * asArr2[x];
+			}
+
+			result[i * j - 1] = sum; // Places it in the resultant array
+		}
+	}
+
+	erase(asArr1);
+	erase(asArr2);
+
+	return result;
+}
